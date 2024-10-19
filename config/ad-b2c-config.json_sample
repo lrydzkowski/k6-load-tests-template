@@ -1,0 +1,11 @@
+{
+  "prod": {
+    "clientId": "{client_id}",
+    "redirectUri": "{redirect_uri}",
+    "scope": "openid offline_access profile",
+    "authorizationEndpoint": "https://{tenant_name}.eu.auth0.com/authorize",
+    "tokenEndpoint": "https://{tenant_name}.eu.auth0.com/oauth/token",
+    "audience": "{audience}",
+    "flow": "authorization_code"
+  }
+}
