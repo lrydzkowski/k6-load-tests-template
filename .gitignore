@@ -129,6 +129,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-config/tokens.json
 config/ad-b2c-config.json
+config/tests-config.json
+config/tokens.json
 TODO.md

@@ -1,29 +1,81 @@
-import http from 'k6/http';
 import { sleep } from 'k6';
-/* @ts-expect-error importing an external dependency */
-import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
-import { SharedArray } from 'k6/data';
+import { Options } from 'k6/options';
+import { randomIntBetween, randomString } from './utils/k6-utils';
+import { host } from './models/test-data';
+import { user1AccessToken } from './models/test-data';
+import { createSet, deleteSet, getSet, getSets, updateSet } from './requests';
+import { user2AccessToken } from './models/test-data';
 
-export const options = {
-  stages: [
-    { duration: '5s', target: 2 },
-    { duration: '10s', target: 2 },
-    { duration: '2s', target: 0 },
-  ],
+export const options: Options = {
+  scenarios: {
+    scenario1: {
+      executor: 'ramping-vus',
+      exec: 'scenario1',
+      stages: [
+        { duration: '10s', target: 40 },
+        { duration: '20s', target: 40 },
+        { duration: '5s', target: 0 },
+      ],
+    },
+    scenario2: {
+      executor: 'ramping-vus',
+      exec: 'scenario2',
+      stages: [
+        { duration: '10s', target: 40 },
+        { duration: '20s', target: 40 },
+        { duration: '5s', target: 0 },
+      ],
+    },
+  },
 };
 
-const config = new SharedArray('config', function () {
-  return [JSON.parse(open('../config/tests-config.json'))];
-});
+export function scenario1() {
+  getSets(host, user1AccessToken);
+  sleep(randomIntBetween(1, 3) / 0.1);
 
-const tokens = new SharedArray('tokens', function () {
-  return [JSON.parse(open('../config/tokens.json'))];
-});
+  getSets(host, user1AccessToken, 0, 25, 'createdAt', 'asc');
+  sleep(randomIntBetween(1, 3) / 0.1);
 
-// console.log(config[0].host);
-// console.log(tokens[0].user1.prod.bearerToken);
+  const createdSetId = createSet(host, user1AccessToken, {
+    entries: [
+      { word: 'word1', wordType: 'noun', translations: ['słowo1'] },
+      { word: 'word2', wordType: 'noun', translations: ['słowo2'] },
+      { word: 'word3', wordType: 'noun', translations: ['słowo3'] },
+    ],
+    setName: randomString(20),
+  });
+  sleep(randomIntBetween(1, 3) / 0.1);
 
-export default function () {
-  http.get('http://test.k6.io');
-  sleep(randomIntBetween(1, 3));
+  updateSet(host, user1AccessToken, {
+    entries: [
+      { word: 'word1', wordType: 'noun', translations: ['słowo1'] },
+      { word: 'word2', wordType: 'noun', translations: ['słowo2'] },
+    ],
+    setName: randomString(20),
+    setId: createdSetId,
+  });
+  sleep(randomIntBetween(1, 3) / 0.1);
+
+  deleteSet(host, user1AccessToken, createdSetId);
+  sleep(randomIntBetween(1, 3) / 0.1);
+}
+
+export function scenario2() {
+  getSets(host, user2AccessToken);
+  sleep(randomIntBetween(1, 3) / 0.1);
+
+  getSets(host, user2AccessToken, 0, 25, 'setId', 'desc', 'set3');
+  sleep(randomIntBetween(1, 3) / 0.1);
+
+  const createdSetId = createSet(host, user2AccessToken, {
+    entries: [{ word: 'word1', wordType: 'noun', translations: ['słowo1'] }],
+    setName: randomString(20),
+  });
+  sleep(randomIntBetween(1, 3) / 0.1);
+
+  getSet(host, user2AccessToken, createdSetId);
+  sleep(randomIntBetween(1, 3) / 0.1);
+
+  deleteSet(host, user2AccessToken, createdSetId);
+  sleep(randomIntBetween(1, 3) / 0.1);
 }
