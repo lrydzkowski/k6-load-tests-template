@@ -1,8 +1,8 @@
 import { check, JSONObject } from 'k6';
 import { Trend } from 'k6/metrics';
 import http from 'k6/http';
-import { ICreateSetRequest } from './models/create-set-request';
-import { IUpdateSetRequest } from './models/update-set-request';
+import { ICreateSetRequest } from './models/create-set-request.js';
+import { IUpdateSetRequest } from './models/update-set-request.js';
 
 const requestTrends = {
   getSets: new Trend('getSets'),

@@ -1,12 +1,13 @@
 import { sleep } from 'k6';
 import { Options } from 'k6/options';
-import { randomIntBetween, randomString } from './utils/k6-utils';
-import { host } from './models/test-data';
-import { user1AccessToken } from './models/test-data';
-import { createSet, deleteSet, getSet, getSets, updateSet } from './requests';
-import { user2AccessToken } from './models/test-data';
+import { host } from './models/test-data.js';
+import { user1AccessToken } from './models/test-data.js';
+import { createSet, deleteSet, getSet, getSets, updateSet } from './requests.js';
+import { user2AccessToken } from './models/test-data.js';
 // @ts-expect-error Import module
-import { htmlReport } from './utils/k6-reporter';
+import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
+// @ts-expect-error Import module
+import { randomIntBetween, randomString } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 
 export const options: Options = {
   scenarios: {
@@ -14,18 +15,18 @@ export const options: Options = {
       executor: 'ramping-vus',
       exec: 'scenario1',
       stages: [
-        { duration: '2s', target: 40 },
-        { duration: '10s', target: 40 },
-        { duration: '1s', target: 0 },
+        { duration: '20s', target: 40 },
+        { duration: '2m', target: 40 },
+        { duration: '10s', target: 0 },
       ],
     },
     scenario2: {
       executor: 'ramping-vus',
       exec: 'scenario2',
       stages: [
-        { duration: '2s', target: 40 },
-        { duration: '10s', target: 40 },
-        { duration: '1s', target: 0 },
+        { duration: '20s', target: 40 },
+        { duration: '2m', target: 40 },
+        { duration: '10s', target: 0 },
       ],
     },
   },
