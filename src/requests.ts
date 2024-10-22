@@ -1,7 +1,16 @@
 import { check, JSONObject } from 'k6';
+import { Trend } from 'k6/metrics';
 import http from 'k6/http';
 import { ICreateSetRequest } from './models/create-set-request';
 import { IUpdateSetRequest } from './models/update-set-request';
+
+const requestTrends = {
+  getSets: new Trend('getSets'),
+  createSet: new Trend('createSet'),
+  updateSet: new Trend('updateSet'),
+  deleteSet: new Trend('deleteSet'),
+  getSet: new Trend('getSet'),
+};
 
 export const getSets = (
   host: string,
@@ -42,8 +51,9 @@ export const getSets = (
   };
   const response = http.get(url, params);
   check(response, {
-    'is status 200': (r) => r.status === 200,
+    'getSets response has status 200': (r) => r.status === 200,
   });
+  requestTrends.getSets.add(response.timings.duration);
 };
 
 export const createSet = (host: string, accessToken: string, request: ICreateSetRequest): number => {
@@ -57,8 +67,9 @@ export const createSet = (host: string, accessToken: string, request: ICreateSet
   };
   const response = http.post(url, payload, params);
   check(response, {
-    'is status 201': (r) => r.status === 201,
+    'createSet response has status 201': (r) => r.status === 201,
   });
+  requestTrends.createSet.add(response.timings.duration);
 
   return (response.json() as JSONObject).setId as number;
 };
@@ -74,8 +85,9 @@ export const updateSet = (host: string, accessToken: string, request: IUpdateSet
   };
   const response = http.put(url, payload, params);
   check(response, {
-    'is status 204': (r) => r.status === 204,
+    'updateSet response has status 204': (r) => r.status === 204,
   });
+  requestTrends.updateSet.add(response.timings.duration);
 };
 
 export const deleteSet = (host: string, accessToken: string, setId: number): void => {
@@ -88,8 +100,9 @@ export const deleteSet = (host: string, accessToken: string, setId: number): voi
   };
   const response = http.del(url, null, params);
   check(response, {
-    'is status 204': (r) => r.status === 204,
+    'deleteSet response has status 204': (r) => r.status === 204,
   });
+  requestTrends.deleteSet.add(response.timings.duration);
 };
 
 export const getSet = (host: string, accessToken: string, setId: number): void => {
@@ -102,6 +115,7 @@ export const getSet = (host: string, accessToken: string, setId: number): void =
   };
   const response = http.get(url, params);
   check(response, {
-    'is status 200': (r) => r.status === 200,
+    'getSet response has status 200': (r) => r.status === 200,
   });
+  requestTrends.getSet.add(response.timings.duration);
 };

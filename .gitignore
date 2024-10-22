@@ -132,4 +132,6 @@ dist
 config/ad-b2c-config.json
 config/tests-config.json
 config/tokens.json
+results/summary.html
+results/summary.json
 TODO.md
